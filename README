@@ -1,0 +1,51 @@
+Musat Mihai-Robert
+Grupa 323CB
+
+Tema 3 POO - Power Bash
+-----------------------
+
+	Pentru implementarea temei, asa cum este recomandat in enunt, am folosit Composite Pattern pentru a modela sistemul 
+de fisiere.Astfel, acesta poate fi vazut ca un arbore in care fiecare nod este de tip fisier sau director, iar nodul radacina 
+este "/".Acest fapt este sugerat prin utilizarea clasei Entity, care trateaza radacina ca o entitate abstracta, iar nodurile 
+arborelui, pot fi tratate ca o lista de astfel de entitati.In aceasta lista, putem avea fie foldere, fie fisiere si de aceea 
+am creat o metoda isFolder care intoarce true daca exista copii.In cadrul sistemului de fisiere, am nevoie si sa obtin calea 
+absoluta si de aceea, am implementat functiile getFiles si getFolders, care se folosesc de un Comparator, deoarece am nevoie la 
+parcurgerea arborelui, sa aleg la fiecare pas, nodurile in ordine lexicografica, pentru a intoarce lista de entitati ordonata.
+Avand aceasta structura, pentru implementarea comenzilor am folosit Command Pattern, fapt evidentiat prin crearea unei
+interfete Command, in care am 4 metode: execute, getResult, getError, getNewWorkingDirectory.Fiecare comanda va implementa
+aceasta interfata si va avea o implementare proprie pentru execute, iar metoda getNewWorkingDirectory ma ajuta sa iau noul 
+director de lucru pentru comenzile care il modifica.De asemenea, pentru a simula comportamentul unui bash, am mai folosit si 
+pattern-urile Singleton si Factory, fapt evidentiat in clasele CommandExecutor si CommandFactory. In clasa CommandExecutor
+am considerat bash-ul ca o lista de comenzi, in care primesc comenzi prin intermediul metodei takeCommand, iar la apelul functiei
+executeCommands, se executa pe rand comenzile din aceasta lista si nu uit sa pastrez rezultatul comenzii, dar si eroarea pe care 
+o intoarce daca este cazul.Clasa CommandFactory simuleaza poate cel mai bine comportamentul de Singleton prin intermediul metodei 
+statice getInstance, care intoarce o singura instanta a clasei in cazul in care nu exista una, dar este in esenta si o clasa care 
+evidentiaza pattern-ul Factory prin faptul ca ia vectorul de argumente si instantiaza fiecare comanda cu argumentele necesare.
+De asemenea, am facut si o clasa statica Utils, in care am implementat o metoda ajutatoare, NavigateToPath, care parcurge
+arborele sistemului de fisiere, si returneaza directorul dat de parametrul path, tinand cont atat de "..", cat si de ".", nu
+doar de faptul ca o cale poate incepe cu "/" sau poate sa contina spatii dupa ce dau split in functie de "/".
+	Comanda pwd afiseaza calea absoluta a folderului curent prin navigarea catre entitatea primita ca parametru si parcurgerea
+in sens invers a caii absolute pana cand se ajunge la root, facand append la inceputul unui string numele folderului curent.
+	Pentru implementarea comenzii ls, am observat ca sunt posibile doua cazuri: fie se doreste o listare non-recursiva, fie se 
+doreste o listare recursiva, data prin parametrul -R.In primul caz, am ales sa ma folosesc de comanda pwd, pentru a printa calea 
+curenta la fiecare director nou, in cadrul metodei nonRecursive, iar pentru al doilea caz folosesc metoda recursive ca sa listez 
+intreg subarborele cu radacina in folderul curent, apeland metoda getFolders descrisa mai sus.
+	Comanda cd este o comanda simpla prin care doar navighez la path prin intermediul functiei ajutatoare NavigateToPath, iar
+apoi setez folderul curent la calea descrisa de path.
+	La implementarea comenzii cp, in cadrul metodei execute, am tinut cont de faptul ca, de asemenea, pot sa am si aici doua 
+cazuri: ca source sa fie folder, sau sa fie fisier.In primul caz, incerc sa navighez la calea completa si daca reusesc, inseamna 
+ca am folder, si ca trebuie sa realizez o copiere recursiva la folderul destinatie.In al doilea caz, inseamna ca nu am reusit,
+deci am fisier si se realizeaza o copiere normala.Analog se intampla si in cazul comenzii mv.
+	Pentru implementarea comenzii rm, am tinut cont de faptul ca se intampla acelasi lucru si daca parametrul este un folder 
+si daca parametrul este fisier: se sterge fisierul sau folderul cu tot cu continutul sau(stergere recursiva).De asemenea, am tratat 
+separat cazurile speciale: ".", "..", "/", in care nu trebuie sa execut nimic.
+	Pentru implementarea comenzii touch, ajung la path-ul dorit dat ca argument si il setez la directorul parinte, apoi ma 
+folosesc de comanda pwd pentru a obtine calea absoluta si implicit numele folderului in care vreau sa creez fisierul.Analog, se 
+intampla si in cazul comenzii mkdir.
+	La implementarea primului bonus, nu am creat o alta clasa separata, deoarece asa cum este precizat in enunt, grep va fi folosit
+in conjunctie cu ls printr-un pipe.Deci, doar am modificat putin clasa CommandFactory astfel incat la parsare sa se tina cont si de 
+cazul in care linia va contine grep, iar in clasa LsCommand, am tratat cazul in care, dupa ce am sortat lista de entitati, adica de 
+fisiere sau foldere, nu am un regex pe care trebuie sa fac match.
+
+
+
